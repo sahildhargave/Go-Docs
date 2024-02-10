@@ -1,0 +1,6 @@
+go 1.21.6
+
+use (
+	./02variables
+	./05handling_time
+)
