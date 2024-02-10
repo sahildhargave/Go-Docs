@@ -23,7 +23,7 @@ func main() {
 	defer response.Body.Close() // caller' Responsility to close the connection
 
 	databytes, err := ioutil.ReadAll(response.Body)
-	if err != nil {
+	if err != nill {
 		panic(err)
 	}
 
