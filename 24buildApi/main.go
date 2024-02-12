@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"math/rand"
 	"net/http"
 	"strconv"
@@ -39,25 +40,35 @@ func main() {
 
 	//seeding
 	courses = append(courses, Course{
-		CourseId: "2",
-		CourseName:"Swift" ,
-	CoursePrice: 299,
-    Author: &Author{
-		Fullname: "Sahil Dhargave",
-		Website: "http",
-	},
-})
+		CourseId:    "2",
+		CourseName:  "Swift",
+		CoursePrice: 299,
+		Author: &Author{
+			Fullname: "Sahil Dhargave",
+			Website:  "http://bymetea",
+		},
+	})
 
-courses = append(courses, Course{
-		CourseId: "3",
-		CourseName:"JS" ,
-	CoursePrice: 29,
-    Author: &Author{
-		Fullname: "Sahil Dhargave",
-		Website: "http",
-	},
-})
+	courses = append(courses, Course{
+		CourseId:    "3",
+		CourseName:  "JS",
+		CoursePrice: 29,
+		Author: &Author{
+			Fullname: "Sahil Dhargave",
+			Website:  "http://buymecoffee",
+		},
+	})
 
+	//routing
+	r.HandleFunc("/", serveHome).Methods("GET")
+	r.HandleFunc("/courses", getAllCourses).Methods("GET")
+	r.HandleFunc("/course/{id}", getOneCourse).Methods("GET")
+	r.HandleFunc("/course", createOneCourse).Methods("POST")
+	r.HandleFunc("/course/{id}", updateOneCourse).Methods("PUT")
+	r.HandleFunc("/course/{id}", deleteOneCourse).Methods("DELETE")
+
+	//listen to a port
+	log.Fatal(http.ListenAndServe(":3002", r))
 
 }
 
@@ -75,7 +86,7 @@ func getAllCourses(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(courses)
 }
 
-func getOneCOurse(w http.ResponseWriter, r *http.Request) {
+func getOneCourse(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Get one course")
 	w.Header().Set("Content-Type", "application/json")
 
@@ -103,63 +114,84 @@ func createOneCourse(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode("Please send some data")
 	}
 	// what about - {}
-	var course Course 
-	_= json.NewDecoder(r.Body).Decode(&course) // &course -> address of variable / reference
-    if course.IsEmpty(){
-		json.NewEncoder(w).Encode("No Data inside JSON");
-		return 
+	var course Course
+	_ = json.NewDecoder(r.Body).Decode(&course) // &course -> address of variable / reference
+	if course.IsEmpty() {
+		json.NewEncoder(w).Encode("No Data inside JSON")
+		return
 	}
 
-	// Generate unique id, string and 
+	// check for duplicate ID's
+	params := mux.Vars(r)
+	for _, course := range courses {
+		if course.CourseName == params["courseName"] {
+			errorMessage := map[string]string{"error": "Course name already exists. Please choose another name."}
+			responseJSON, err := json.Marshal(errorMessage)
+			if err != nil {
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+				return
+			}
+
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusBadRequest) // 400 Bad Request
+			w.Write(responseJSON)
+			return
+		}
+	}
+
+	// Generate unique id, string and
 	// append course into courses
 
-	rand.Seed(time.Now().UnixNano());
+	rand.Seed(time.Now().UnixNano())
 	course.CourseId = strconv.Itoa(rand.Intn(100))
 	courses = append(courses, course)
 	json.NewEncoder(w).Encode(course)
 	return
 
-
 }
 
-func updateOneCourse (w http.ResponseWriter,r *http.Request){
+func updateOneCourse(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Create on Course")
-	w.Header().Set("Content-Type","application/json")
+	w.Header().Set("Content-Type", "application/json")
 
 	//first - grab id from req
 	params := mux.Vars(r)
 
 	// loop, id , remove from, add with my ID
-	for index,course := range courses{
-		if course.CourseId == params["id"]{
-			courses= append(courses[:index], courses[index+1:]...)
+	for index, course := range courses {
+		if course.CourseId == params["id"] {
+			courses = append(courses[:index], courses[index+1:]...)
 			var course Course
-			_=json.NewDecoder(r.Body).Decode(&course)
-		    course.CourseId = params["id"]
+			_ = json.NewDecoder(r.Body).Decode(&course)
+			course.CourseId = params["id"]
 			courses = append(courses, course)
 			json.NewEncoder(w).Encode(course)
 			return
 		}
+		if course.CourseId != params["id"] {
+			json.NewEncoder(w).Encode("NotFound")
+			return
+		}
+
 	}
 
-	// TODO: send a Response when id is not found 
+	// TODO: send a Response when id is not found
 
 }
 
-func deleteOneCourse (w http.ResponseWriter, r *http.Request) {
-  fmt.Println("Delete one course")
-  w.Header().Set("Content-Type", "application/json")
+func deleteOneCourse(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Delete one course")
+	w.Header().Set("Content-Type", "application/json")
 
-  params := mux.Vars(r)
-  //loop,id,remove(index, index+1)
+	params := mux.Vars(r)
+	//loop,id,remove(index, index+1)
 
-  for index,course :=range courses{
-	if course.CourseId == params["id"]{
-		courses= append(courses[:index],courses[index+1:]...)
-		json.NewEncoder(w).Encode("We are successfully Delete Course");
-		break
+	for index, course := range courses {
+		if course.CourseId == params["id"] {
+			courses = append(courses[:index], courses[index+1:]...)
+			json.NewEncoder(w).Encode("We are successfully Delete Course")
+			break
+		}
 	}
-  }
- 
 
 }
