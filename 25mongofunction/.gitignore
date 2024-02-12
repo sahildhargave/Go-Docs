@@ -1,0 +1,20 @@
+# Compiled binary
+/bin/
+
+# Executables
+*.exe
+*.out
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Dependency directories (remove the ones you don't need)
+/vendor/
+/Godeps/
+/node_modules/
+/.glide/
+/.gogradle/
+/_gogradle/
+
+# Output of the go command (remove the one you don't need)
+/myapp
