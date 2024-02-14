@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/gorilla/mux"
 	"github.com/sahildhargave/25mongodb/model"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -131,14 +132,28 @@ func getAllMovies() []primitive.M{
 // A😁😂🤣Actual controller -file
 
 func GetMyAllMovies(w http.ResponseWriter, r *http.Request){
- w.Header().Set("Content-Type","application/x-www-form-urlencoded") //set header
+ w.Header().Set("Content-Type","application/x-www-form-urlencode") //set header
  allMovies := getAllMovies()
  json.NewEncoder(w).Encode(allMovies)
 }
 
 // 😁😂 create function
 func CreateMovie(w http.ResponseWriter, r *http.Request){
-  w.Header().Set("Content-Type", "application/x-www-form-urlencoded")
+  w.Header().Set("Content-Type", "application/x-www-form-urlencode")
   w.Header().Set("Allow-Control-Allow-Methods","POST")
-  var movie model.NewEncoder
+  var movie model.Netflix
+
+  _ = json.NewDecoder(r.Body).Decode(&movie)
+  insertOneMovie(movie)
+  json.NewEncoder(w).Encode(movie)
+  
+}
+
+func MarkAsWatched(w http.ResponseWriter, r *http.Request){
+	w.Header().Set("Content-Type", "application/x-www-form-urlencode")
+	w.Header().Set("Allow-Control-Allow-Methods","POST")
+
+	params := mux.Vars(r)
+	updateOnMovie(params["id"])
+	json.NewEncoder(w).Encode(params["id"])
 }
