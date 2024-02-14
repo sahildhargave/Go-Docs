@@ -157,3 +157,11 @@ func MarkAsWatched(w http.ResponseWriter, r *http.Request){
 	updateOnMovie(params["id"])
 	json.NewEncoder(w).Encode(params["id"])
 }
+
+func DeleteAllMovie(w http.ResponseWriter,r *http.Request){
+	w.Header().Set("Content-Type","application/x-www-form-urlencode")
+	w.Header().Set("Allow-Control-Allow-Methods","POST")
+
+	count := deleteAllMovie()
+	json.NewEncoder(w).Encode(count)
+}
