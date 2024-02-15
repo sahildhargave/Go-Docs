@@ -66,7 +66,7 @@ func updateOneMovie(movieId string) {
 	//TODO 😀😁 THERE ARE TWO BSON.M and BSON.D
 	filter := bson.M{"_id": id}
 	update := bson.M{"$set": bson.M{"watched": true}}
-	updated, err := collection.UpdateOne(context.TODO(), filter, update)
+	updated, err := collection.UpdateOne(context.Background(), filter, update)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -88,17 +88,19 @@ func deleteOneMovie(movieId string) {
 // 👽👾🤖💩😺😸😹😻😼😽🙀
 // Delete all records from mongodb
 
-func deleteAllMovies() (int64, error) {
+func deleteAllMovie() int64 {
 	//😁 if not having any value in {} then {{}} --> select every things
 	//filter := bson.D{{}}
 	// most of the go developer prefer
-	deleted, err := collection.DeleteMany(context.Background(), bson.D{{}})
+	deleteResult, err := collection.DeleteMany(context.Background(), bson.D{{}}, nil)
+	//   collection.DeleteMany(context.Background(), filter)
+
 	if err != nil {
-		return 0, fmt.Errorf("error deleting movies: %w", err)
+		log.Fatal(err)
 	}
 
-	log.Printf("Deleted %d movies from collection %s", deleted.DeletedCount, colName)
-	return deleted.DeletedCount, nil
+	fmt.Println("Number of movies delete:", deleteResult.DeletedCount)
+	return deleteResult.DeletedCount
 
 }
 
@@ -147,13 +149,12 @@ func CreateMovie(w http.ResponseWriter, r *http.Request) {
 }
 
 func MarkAsWatched(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/x-www-form-urlencode")
 	w.Header().Set("Allow-Control-Allow-Methods", "PUT")
 
 	params := mux.Vars(r)
 	updateOneMovie(params["id"])
-	response := map[string]string{"msg": "Marked as watched"}
-	json.NewEncoder(w).Encode(response)
+	json.NewEncoder(w).Encode(`{"msg":"Marked as watched"}`)
 }
 
 func DeleteAMovie(w http.ResponseWriter, r *http.Request) {
@@ -165,12 +166,10 @@ func DeleteAMovie(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(params["id"])
 }
 
-// Delete all records from MongoDB
-func DeleteAllMovie(w http.ResponseWriter, r *http.Request) {
+func DeleteAllMovies(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/x-www-form-urlencode")
-	w.Header().Set("Allow-Control-Allow-Methods", "DELETE")
+	w.Header().Set("Allow-Control-Allow-Methods", "POST")
 
-	_, count := deleteAllMovies()
-
+	count := deleteAllMovie()
 	json.NewEncoder(w).Encode(count)
 }

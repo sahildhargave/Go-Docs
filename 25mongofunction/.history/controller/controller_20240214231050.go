@@ -88,17 +88,17 @@ func deleteOneMovie(movieId string) {
 // 👽👾🤖💩😺😸😹😻😼😽🙀
 // Delete all records from mongodb
 
-func deleteAllMovies() (int64, error) {
+func deleteAllMovie() int64 {
 	//😁 if not having any value in {} then {{}} --> select every things
 	//filter := bson.D{{}}
 	// most of the go developer prefer
 	deleted, err := collection.DeleteMany(context.Background(), bson.D{{}})
 	if err != nil {
-		return 0, fmt.Errorf("error deleting movies: %w", err)
+		log.Fatal(err)
 	}
 
-	log.Printf("Deleted %d movies from collection %s", deleted.DeletedCount, colName)
-	return deleted.DeletedCount, nil
+	fmt.Println("Deleted count", deleted.DeletedCount)
+	return deleted.DeletedCount
 
 }
 
@@ -167,10 +167,10 @@ func DeleteAMovie(w http.ResponseWriter, r *http.Request) {
 
 // Delete all records from MongoDB
 func DeleteAllMovie(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/x-www-form-urlencode")
+	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Allow-Control-Allow-Methods", "DELETE")
 
-	_, count := deleteAllMovies()
+	deleteAllMovie()
 
-	json.NewEncoder(w).Encode(count)
+	json.NewEncoder(w).Encode(`{"msg": "Deleted all successfully"}`)
 }
