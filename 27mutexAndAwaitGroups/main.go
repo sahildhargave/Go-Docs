@@ -41,3 +41,8 @@ func main() {
 	wg.Wait()
 	fmt.Println(score)
 }
+
+//TODO go run --race .
+//# runtime/cgo
+//cc1.exe: sorry, unimplemented: 64-bit mode not compiled in
+//(base) PS E:\GO\27mutexAndAwaitGroups> go run --race .
