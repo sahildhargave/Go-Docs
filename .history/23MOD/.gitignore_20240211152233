@@ -1,0 +1,8 @@
+# Ignore the go.mod file
+/go.mod
+
+# Ignore the go.sum file
+/go.sum
+
+# Ignore the vendor directory
+/vendor/

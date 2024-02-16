@@ -3,4 +3,7 @@ go 1.21.6
 use (
 	./02variables
 	./05handling_time
+	./23MOD
+	./25mongofunction
+	./27mutexAndAwaitGroups
 )
