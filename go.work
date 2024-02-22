@@ -1,4 +1,4 @@
-go 1.21.6
+go 1.22.0
 
 use (
 	./02variables
@@ -6,4 +6,9 @@ use (
 	./23MOD
 	./25mongofunction
 	./27mutexAndAwaitGroups
+	./Projects/BookstoreManagement
+	./Projects/age-bot
+	./Projects/buildAPI
+	./Projects/static
+	./Projects/todo/server
 )

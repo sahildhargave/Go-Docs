@@ -24,6 +24,7 @@ func init() {
 	config.Connect()
 	db = config.GetDB()
 	//db.AutoMigrate(&Book{}) // 自动迁移
+	
 	db.AutoMigrate(&Book{})
 }
 

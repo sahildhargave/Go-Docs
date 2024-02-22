@@ -1,0 +1,43 @@
+# Build artifacts
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binaries
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# IDE or editor temporary files
+.idea/*
+.vscode/*
+
+# Vendored dependencies (adjust path if needed)
+vendor/*
+
+# Go workspace file
+go.work
+
+# Dependency lock files
+go.sum
+
+# Local configuration files
+.env
+.secrets
+
+# Build cache
+# Add specific folders where cached build files are stored
+build/*
+
+# Unit test output files
+# If you use a specific framework, like Ginkgo, you might need to ignore its output folder
+test-output/*
+
+# Specific to GoLand IDE
+.goLand/*
+
+# Ignore any other files or folders as needed
+# This is just a starting point, adjust it based on your project structure and preferen
